@@ -12,6 +12,14 @@ type Runtime struct {
 	fallback  domain.Profile
 }
 
+func (r *Runtime) ActivateJSON(data []byte) error {
+	profile, err := ParseJSON(data, r.providers)
+	if err != nil {
+		return err
+	}
+	return r.Activate(profile)
+}
+
 func NewRuntime(providers map[string]struct{}, fallback domain.Profile) (*Runtime, error) {
 	if err := fallback.Validate(providers); err != nil {
 		return nil, fmt.Errorf("invalid fallback profile: %w", err)

@@ -52,3 +52,19 @@ func TestRuntimeRejectsInvalidProfileAndRecoversFallback(t *testing.T) {
 		t.Fatalf("unexpected recovery profile: %q", recovered.Name)
 	}
 }
+
+func TestRuntimeActivatesJSONProfile(t *testing.T) {
+	runtime, err := NewRuntime(
+		map[string]struct{}{"openrgb": {}},
+		domain.Profile{Name: "safe", Ownership: []domain.Ownership{{Resource: domain.ResourceRGB, Provider: "openrgb"}}},
+	)
+	if err != nil {
+		t.Fatalf("failed to create runtime: %v", err)
+	}
+	if err := runtime.ActivateJSON([]byte(`{"name":"quiet","ownership":[{"resource":"rgb","provider":"openrgb"}]}`)); err != nil {
+		t.Fatalf("failed to activate JSON profile: %v", err)
+	}
+	if runtime.Active().Name != "quiet" {
+		t.Fatalf("unexpected active profile: %q", runtime.Active().Name)
+	}
+}
