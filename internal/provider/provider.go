@@ -32,3 +32,11 @@ func (r *Registry) Names() []string {
 	}
 	return names
 }
+
+func (r *Registry) Adapters() []Adapter {
+	adapters := make([]Adapter, 0, len(r.providers))
+	for _, adapter := range r.providers {
+		adapters = append(adapters, adapter)
+	}
+	return adapters
+}

@@ -1,31 +1,103 @@
 # MysticLight Control Center
 
-Unified, safety-first control plane for RGB lighting, cooling telemetry,
-profiles, and LCD status. Existing projects remain the device providers; this
-application coordinates them through explicit adapters and ownership rules.
+MysticLight Control Center is a local-first coordination service for RGB
+lighting, cooling telemetry, LCD status, sensors, profiles, and game-focus
+events. It provides one consistent control plane while leaving existing
+hardware providers in charge of their devices.
 
-## Goals
+## Why this project exists
 
-- One installation and one user interface.
-- Coordinate OpenRGB, CoolerControl/CoolerDash, LCD telemetry, sensors, and game focus.
-- Keep fan/PWM, LCD, and RGB ownership isolated to prevent write conflicts.
-- Detect missing capabilities as warnings and preserve safe fallback behavior.
-- Provide health, diagnostics, rollback, and restart recovery.
+Desktop hardware-control tools often expose overlapping capabilities without a
+shared ownership model. That can produce conflicting writes, unclear failure
+states, and difficult recovery. This project adds a provider-neutral domain
+layer, explicit ownership rules, health reporting, profiles, diagnostics, and
+safe fallback behavior.
 
-## Ordered roadmap
+## Project scope
 
-1. Architecture RFC and ownership contract.
-2. Shared configuration/profile schema.
-3. Provider adapters (OpenRGB, CoolerControl, LCD, sensors, focus).
-4. Unified health/diagnostics service.
-5. Local daemon and event pipeline.
-6. Desktop UI for status, profiles, cooling, RGB, and LCD.
-7. Single installer, systemd integration, upgrades, and rollback.
-8. Compatibility matrix and hardware-specific GPU capability probe.
-9. End-to-end reboot, suspend/resume, and failure-recovery tests.
+### Included
 
-## Safety
+- Provider discovery and capability reporting.
+- Normalized RGB, cooling, LCD, sensor, and game-focus state.
+- Explicit ownership for RGB, fan/PWM, LCD, telemetry, and profiles.
+- Validated profiles with conflict detection.
+- Provider health, timeouts, redacted diagnostics, and recovery events.
+- A local daemon and event pipeline.
+- A desktop UI consuming service contracts.
+- Compatibility documentation, packaging, systemd integration, upgrades, and
+  rollback.
 
-The control center does not reimplement hardware drivers. CoolerControl remains
-the fan/pump PWM owner, OpenRGB the RGB owner, and the LCD provider the display
-owner. Secrets, serials, tokens, and raw host identifiers must never be stored.
+### Excluded
+
+- New hardware drivers or firmware changes.
+- Experimental raw HID, SMBus, or I2C operations.
+- Multiple writers for the same physical resource.
+- Cloud accounts, remote control, or mandatory internet access.
+- Credentials, serial numbers, addresses, stable device identifiers, or raw
+  host identity in configuration, logs, tests, or documentation.
+
+## Ownership and safety model
+
+| Resource | Provider owner | Control Center responsibility |
+| --- | --- | --- |
+| RGB lighting | OpenRGB | Capability, profile, health, and policy coordination |
+| Fan and pump PWM | CoolerControl/CoolerDash | Read-only telemetry and ownership enforcement |
+| LCD display | LCD provider | Status normalization and recovery policy |
+| Sensor telemetry | Existing sensor provider | Normalization and diagnostics |
+| Game focus | Focus adapter | Local event production |
+
+The first implementation stages are read-only and mock-driven. Automated tests
+must never write to physical hardware. Any later physical test requires
+explicit authorization, a selected device and zone, low-brightness startup,
+and a tested rollback path.
+
+## Development milestones
+
+1. **Contracts and governance** — scope, ownership, privacy, architecture, and
+   language decisions.
+2. **Core domain** — capabilities, resources, profiles, validation, and
+   provider registry.
+3. **Service and events** — health, timeouts, normalized observations,
+   redacted diagnostics, and recovery events.
+4. **Read-only adapters** — OpenRGB, cooling, LCD, sensors, and focus provider
+   integrations behind the contracts.
+5. **Profile runtime** — validated activation, safe fallback, and restart
+   recovery without physical writes.
+6. **Desktop UI** — status, profiles, diagnostics, and capability visibility.
+7. **Operations** — packaging, systemd service, upgrades, rollback, and
+   compatibility matrix.
+8. **Controlled hardware enablement** — separately reviewed and authorized
+   provider writes, if required.
+
+Each milestone requires tests, a privacy review, documented safety impact, and
+rollback notes before it is considered complete.
+
+## Current implementation
+
+The service and adapter layers use Go 1.27.1 with a project-local toolchain.
+The repository currently contains the initial domain/provider contracts,
+profile validation, a mock provider, and unit tests. Real provider connections,
+the daemon runtime, and the UI are not implemented yet.
+
+## Repository map
+
+- `internal/domain/` — provider-neutral resources, capabilities, ownership,
+  health, and profile rules.
+- `internal/provider/` — adapter contracts, registry, and test doubles.
+- `docs/PROJECT_SCOPE.md` — detailed scope and phase exit criteria.
+- `docs/ARCHITECTURE_RFC.md` — layered architecture and safety contract.
+- `docs/IMPLEMENTATION_PLAN.md` — first implementation slices.
+- `docs/RELEASE_NOTES.md` — recorded project milestones and unreleased work.
+- `DEVELOPMENT.md` — local toolchain and validation commands.
+
+## Validation
+
+```bash
+export PATH="$PWD/.toolchain/go-1.27.1/bin:$PATH"
+gofmt -w .
+go test ./...
+go vet ./...
+git diff --check
+```
+
+Provider tests use mocks and do not claim physical hardware verification.
