@@ -25,7 +25,7 @@ func TestAPIHealthAndProvidersAreReadOnly(t *testing.T) {
 	}
 	handler := Server{Registry: registry, ProfileService: profileService}.Handler()
 
-	for _, path := range []string{"/health", "/providers"} {
+	for _, path := range []string{"/health", "/providers", "/profiles"} {
 		request := httptest.NewRequest(http.MethodGet, path, nil)
 		recorder := httptest.NewRecorder()
 		handler.ServeHTTP(recorder, request)
