@@ -57,3 +57,23 @@ func DefaultReadOnlyAdapters() []provider.Adapter {
 		NotConfigured{ProviderName: GameFocus, Resource: domain.ResourceFocus},
 	}
 }
+
+func NewOpenRGB() provider.Adapter {
+	return NotConfigured{ProviderName: OpenRGB, Resource: domain.ResourceRGB}
+}
+
+func NewCoolerControl() provider.Adapter {
+	return NotConfigured{ProviderName: CoolerControl, Resource: domain.ResourcePWM}
+}
+
+func NewLCD() provider.Adapter {
+	return NotConfigured{ProviderName: LCD, Resource: domain.ResourceLCD}
+}
+
+func NewSensors() provider.Adapter {
+	return NotConfigured{ProviderName: Sensors, Resource: domain.ResourceTelemetry}
+}
+
+func NewGameFocus() provider.Adapter {
+	return NotConfigured{ProviderName: GameFocus, Resource: domain.ResourceFocus}
+}
