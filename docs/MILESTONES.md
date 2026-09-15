@@ -13,7 +13,7 @@ No milestone may bypass the ownership, privacy, or rollback gates.
 
 ## M2 — Core domain and provider contracts
 
-**Status:** In progress
+**Status:** Complete
 
 - Model resources, capabilities, ownership, provider health, and profiles.
 - Reject duplicate ownership and unknown providers deterministically.
@@ -24,7 +24,7 @@ services or hardware.
 
 ## M3 — Service and event layer
 
-**Status:** Next
+**Status:** Complete
 
 - Add provider polling with context timeouts.
 - Normalize observations and health transitions.
@@ -36,7 +36,7 @@ in deterministic mock tests.
 
 ## M4 — Read-only provider adapters
 
-**Status:** In progress
+**Status:** Complete
 
 - Implement OpenRGB, cooling, LCD, sensor, and focus adapters.
 - Keep each adapter behind the provider interface.
@@ -50,7 +50,7 @@ physical writes remain disabled.
 
 ## M5 — Profile runtime and safe fallback
 
-**Status:** Planned
+**Status:** Complete
 
 - Load and validate profiles.
 - Select safe fallback behavior when capabilities are missing.
@@ -71,7 +71,7 @@ providers.
 
 ## M7 — Operations and release
 
-**Status:** Planned
+**Status:** In progress
 
 - Package the daemon and UI.
 - Add systemd integration, upgrade checks, and rollback procedures.
