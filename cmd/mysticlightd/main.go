@@ -16,7 +16,7 @@ import (
 
 func main() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	registry := provider.NewRegistry(adapters.DefaultReadOnlyAdapters()...)
+	registry := provider.NewRegistry(adapters.FromEnvironment()...)
 	monitor := service.NewMonitor(registry, 5*time.Second)
 	bus := events.NewBus()
 	_ = bus.Subscribe(len(registry.Names()))
