@@ -1,0 +1,17 @@
+[Unit]
+Description=MysticLight Control Center daemon
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/mysticlightd
+Restart=on-failure
+RestartSec=5s
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=%S/mysticlight-control-center
+
+[Install]
+WantedBy=default.target
