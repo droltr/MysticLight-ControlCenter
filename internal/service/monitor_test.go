@@ -69,3 +69,17 @@ func TestMonitorReportsTimeoutAsProviderFailure(t *testing.T) {
 		t.Fatal("timed-out provider must not remain available")
 	}
 }
+
+func TestMonitorPublishesEventsToBus(t *testing.T) {
+	registry := provider.NewRegistry(provider.MockAdapter{
+		ProviderName: "sensors",
+		HealthState:  domain.ProviderHealth{Available: true},
+	})
+	bus := events.NewBus()
+	subscriber := bus.Subscribe(1)
+
+	NewMonitor(registry, time.Second).ObserveAndPublish(context.Background(), bus)
+	if actual := <-subscriber; actual.Provider != "sensors" {
+		t.Fatalf("unexpected published provider: %q", actual.Provider)
+	}
+}
