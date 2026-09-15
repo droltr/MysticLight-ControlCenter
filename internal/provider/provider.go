@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"sort"
+
 	"context"
 
 	"github.com/droltr/MysticLight-ControlCenter/internal/domain"
@@ -30,6 +32,7 @@ func (r *Registry) Names() []string {
 	for name := range r.providers {
 		names = append(names, name)
 	}
+	sort.Strings(names)
 	return names
 }
 
@@ -38,5 +41,8 @@ func (r *Registry) Adapters() []Adapter {
 	for _, adapter := range r.providers {
 		adapters = append(adapters, adapter)
 	}
+	sort.Slice(adapters, func(i, j int) bool {
+		return adapters[i].Name() < adapters[j].Name()
+	})
 	return adapters
 }
