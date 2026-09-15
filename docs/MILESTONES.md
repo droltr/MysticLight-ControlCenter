@@ -36,11 +36,14 @@ in deterministic mock tests.
 
 ## M4 — Read-only provider adapters
 
-**Status:** Planned
+**Status:** In progress
 
 - Implement OpenRGB, cooling, LCD, sensor, and focus adapters.
 - Keep each adapter behind the provider interface.
 - Document supported provider versions and capability gaps.
+
+The initial adapter boundary and compatibility matrix are now present. Real
+provider connections remain future work.
 
 **Exit criteria:** contract tests pass with recorded compatibility evidence;
 physical writes remain disabled.
