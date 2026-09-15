@@ -1,6 +1,7 @@
 package api
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,6 +12,9 @@ import (
 	"github.com/droltr/MysticLight-ControlCenter/internal/service"
 )
 
+//go:embed web/index.html
+var dashboard []byte
+
 type Server struct {
 	Registry       *provider.Registry
 	ProfileService *service.ProfileService
@@ -18,11 +22,18 @@ type Server struct {
 
 func (s Server) Handler() http.Handler {
 	mux := http.NewServeMux()
+	mux.HandleFunc("GET /", s.dashboard)
 	mux.HandleFunc("GET /health", s.health)
 	mux.HandleFunc("GET /providers", s.providers)
 	mux.HandleFunc("POST /profiles/validate", s.validateProfile)
 	mux.HandleFunc("POST /profiles/activate", s.activateProfile)
 	return mux
+}
+
+func (s Server) dashboard(writer http.ResponseWriter, _ *http.Request) {
+	writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+	writer.WriteHeader(http.StatusOK)
+	_, _ = writer.Write(dashboard)
 }
 
 func (s Server) health(writer http.ResponseWriter, _ *http.Request) {
