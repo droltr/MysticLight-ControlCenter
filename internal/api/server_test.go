@@ -35,6 +35,24 @@ func TestAPIHealthAndProvidersAreReadOnly(t *testing.T) {
 	}
 }
 
+func TestAPIServesDashboard(t *testing.T) {
+	registry := provider.NewRegistry(adapters.NewOpenRGB())
+	profileService, err := service.NewProfileService(
+		map[string]struct{}{adapters.OpenRGB: {}},
+		domain.Profile{Name: "safe"},
+		filepath.Join(t.TempDir(), "profile.json"),
+	)
+	if err != nil {
+		t.Fatalf("profile service: %v", err)
+	}
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "/", nil)
+	Server{Registry: registry, ProfileService: profileService}.Handler().ServeHTTP(recorder, request)
+	if recorder.Code != http.StatusOK || !strings.Contains(recorder.Body.String(), "MysticLight Control Center") {
+		t.Fatalf("dashboard was not served: status=%d", recorder.Code)
+	}
+}
+
 func TestAPIValidatesAndActivatesProfile(t *testing.T) {
 	registry := provider.NewRegistry(adapters.NewOpenRGB())
 	profileService, err := service.NewProfileService(
