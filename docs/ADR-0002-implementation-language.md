@@ -40,8 +40,8 @@ desktop service that should be easy to install and roll back.
 
 ## Constraints
 
-- The Go toolchain must be pinned in the repository's compatibility
-  documentation before implementation is merged.
+- The Go toolchain is pinned to Go `1.27.1` for the initial development
+  environment and must remain documented when implementation is merged.
 - Dependencies must be minimal, reviewed, and recorded through `go.mod` and
   `go.sum`.
 - The first code slice remains read-only and mock-driven.
