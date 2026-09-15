@@ -49,6 +49,24 @@ type ProviderHealth struct {
 	Error     string
 }
 
+type HealthState string
+
+const (
+	HealthAvailable   HealthState = "available"
+	HealthDegraded    HealthState = "degraded"
+	HealthUnavailable HealthState = "unavailable"
+)
+
+func (h ProviderHealth) State() HealthState {
+	if !h.Available {
+		return HealthUnavailable
+	}
+	if h.Error != "" {
+		return HealthDegraded
+	}
+	return HealthAvailable
+}
+
 type Profile struct {
 	Name      string
 	Ownership []Ownership
