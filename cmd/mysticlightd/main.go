@@ -24,9 +24,8 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	for _, event := range monitor.ObserveAndPublish(ctx, bus) {
-		logger.Info("provider observation", "provider", event.Provider, "kind", event.Kind, "state", event.Health.State())
-	}
+	go monitor.Run(ctx, 30*time.Second, bus)
 	<-ctx.Done()
+	bus.Close()
 	logger.Info("daemon stopped")
 }

@@ -83,3 +83,27 @@ func TestMonitorPublishesEventsToBus(t *testing.T) {
 		t.Fatalf("unexpected published provider: %q", actual.Provider)
 	}
 }
+
+func TestMonitorRunStopsOnContextCancellation(t *testing.T) {
+	registry := provider.NewRegistry(provider.MockAdapter{
+		ProviderName: "openrgb",
+		HealthState:  domain.ProviderHealth{Available: true},
+	})
+	bus := events.NewBus()
+	subscriber := bus.Subscribe(2)
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan struct{})
+	go func() {
+		NewMonitor(registry, time.Second).Run(ctx, time.Millisecond, bus)
+		close(done)
+	}()
+
+	<-subscriber
+	cancel()
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("monitor did not stop after context cancellation")
+	}
+	bus.Close()
+}
