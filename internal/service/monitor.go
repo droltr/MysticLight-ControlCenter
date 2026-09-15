@@ -29,6 +29,23 @@ func (m *Monitor) ObserveAndPublish(ctx context.Context, bus *events.Bus) []even
 	return m.observe(ctx, bus)
 }
 
+func (m *Monitor) Run(ctx context.Context, interval time.Duration, bus *events.Bus) {
+	if interval <= 0 {
+		interval = time.Second
+	}
+	m.ObserveAndPublish(ctx, bus)
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			m.ObserveAndPublish(ctx, bus)
+		}
+	}
+}
+
 func (m *Monitor) observe(ctx context.Context, bus *events.Bus) []events.Event {
 	observations := make([]events.Event, 0)
 	for _, adapter := range m.registry.Adapters() {

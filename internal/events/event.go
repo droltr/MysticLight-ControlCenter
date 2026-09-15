@@ -22,6 +22,7 @@ type Event struct {
 
 type Bus struct {
 	subscribers []chan Event
+	closed      bool
 }
 
 func NewBus() *Bus {
@@ -38,7 +39,21 @@ func (b *Bus) Subscribe(buffer int) <-chan Event {
 }
 
 func (b *Bus) Publish(event Event) {
+	if b.closed {
+		return
+	}
 	for _, subscriber := range b.subscribers {
 		subscriber <- event
 	}
+}
+
+func (b *Bus) Close() {
+	if b.closed {
+		return
+	}
+	b.closed = true
+	for _, subscriber := range b.subscribers {
+		close(subscriber)
+	}
+	b.subscribers = nil
 }
