@@ -1,0 +1,8 @@
+# Local development toolchains and build outputs
+.toolchain/
+bin/
+dist/
+
+# Go workspace and test artifacts
+coverage.out
+*.test
