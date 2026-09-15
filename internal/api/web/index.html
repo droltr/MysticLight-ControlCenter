@@ -19,12 +19,17 @@
     <p>Local provider health and capability dashboard.</p>
     <section><h2>Service health</h2><p id="health">Loading...</p></section>
     <section><h2>Providers</h2><pre id="providers">Loading...</pre></section>
+    <section><h2>Active profile</h2><pre id="profile">Loading...</pre>
+      <textarea id="candidate" rows="6" style="width:100%" aria-label="Profile JSON">{"name":"safe","ownership":[]}</textarea>
+      <button id="validate">Validate profile</button><p id="validation"></p>
+    </section>
     <section><h2>Safety</h2><p class="ok">Physical write operations are disabled in this interface.</p></section>
   </main>
   <script>
     async function load() {
       const health = document.getElementById('health');
       const providers = document.getElementById('providers');
+      const profile = document.getElementById('profile');
       try {
         const healthResponse = await fetch('/health');
         const healthData = await healthResponse.json();
@@ -32,12 +37,26 @@
         health.className = healthData.status === 'ok' ? 'ok' : 'warn';
         const providerResponse = await fetch('/providers');
         providers.textContent = JSON.stringify(await providerResponse.json(), null, 2);
+        const profileResponse = await fetch('/profiles');
+        profile.textContent = JSON.stringify(await profileResponse.json(), null, 2);
       } catch (error) {
         health.textContent = 'Unavailable';
         health.className = 'warn';
         providers.textContent = String(error);
       }
     }
+    document.getElementById('validate').addEventListener('click', async () => {
+      const result = document.getElementById('validation');
+      try {
+        const response = await fetch('/profiles/validate', {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: document.getElementById('candidate').value
+        });
+        const data = await response.json();
+        result.textContent = response.ok ? 'Profile is valid.' : data.error;
+        result.className = response.ok ? 'ok' : 'warn';
+      } catch (error) { result.textContent = String(error); result.className = 'warn'; }
+    });
     load();
   </script>
 </body>

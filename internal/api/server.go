@@ -25,6 +25,7 @@ func (s Server) Handler() http.Handler {
 	mux.HandleFunc("GET /", s.dashboard)
 	mux.HandleFunc("GET /health", s.health)
 	mux.HandleFunc("GET /providers", s.providers)
+	mux.HandleFunc("GET /profiles", s.currentProfile)
 	mux.HandleFunc("POST /profiles/validate", s.validateProfile)
 	mux.HandleFunc("POST /profiles/activate", s.activateProfile)
 	return mux
@@ -49,6 +50,10 @@ func (s Server) providers(writer http.ResponseWriter, _ *http.Request) {
 		})
 	}
 	writeJSON(writer, http.StatusOK, items)
+}
+
+func (s Server) currentProfile(writer http.ResponseWriter, _ *http.Request) {
+	writeJSON(writer, http.StatusOK, s.ProfileService.Active())
 }
 
 func (s Server) validateProfile(writer http.ResponseWriter, request *http.Request) {
