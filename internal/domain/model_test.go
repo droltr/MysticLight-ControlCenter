@@ -42,3 +42,22 @@ func TestProfileValidateAcceptsUniqueKnownOwners(t *testing.T) {
 		t.Fatalf("expected profile to validate: %v", err)
 	}
 }
+
+func TestProviderHealthState(t *testing.T) {
+	cases := []struct {
+		name     string
+		health   ProviderHealth
+		expected HealthState
+	}{
+		{name: "available", health: ProviderHealth{Available: true}, expected: HealthAvailable},
+		{name: "degraded", health: ProviderHealth{Available: true, Error: "timeout"}, expected: HealthDegraded},
+		{name: "unavailable", health: ProviderHealth{}, expected: HealthUnavailable},
+	}
+	for _, test := range cases {
+		t.Run(test.name, func(t *testing.T) {
+			if actual := test.health.State(); actual != test.expected {
+				t.Fatalf("expected %q, got %q", test.expected, actual)
+			}
+		})
+	}
+}
